@@ -75,20 +75,6 @@ namespace trie_nodes {
     private:
         int count = 0;
     };
-    
-    struct ACNode {
-        using query_result_type = int;
-        using has_prefix_update = std::false_type;
-        using has_suffix_update = std::true_type;
-        static size_t get_key(char ch) { return ch - 'a'; }
-        void clear() { index_map.fill(0), end_count = 0; }
-        void suffix_update() { ++end_count; }
-        bool queryable() const { return end_count >= 0; }
-        query_result_type query_result() { int tmp = end_count; end_count = -1; return tmp; }
-        std::array<int, 26> index_map;
-    private:
-        int end_count = 0;
-    };
 }
 
 #endif

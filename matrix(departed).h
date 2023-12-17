@@ -1,5 +1,4 @@
 #include <iterator>
-
 #include <memory>
 #include <cstring>
 namespace lcf {

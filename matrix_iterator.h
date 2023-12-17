@@ -1,6 +1,5 @@
 #ifndef MARTIX_ITERATOR_H
 #define MARTIX_ITERATOR_H
-#include "iterator.h"
 
 namespace lcf {
     template<typename T>

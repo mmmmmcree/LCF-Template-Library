@@ -111,7 +111,9 @@ namespace lcf {
         //*----------------------------------------------------------------------------*//
         square_matrix(size_type size, const_reference value = value_type{}) : _Base(size * size, value), _size(size) { }
         iterator begin() { return _Base::begin(); }
+        iterator begin() const { return _Base::begin(); }
         iterator end() { return _Base::end(); }
+        iterator end() const { return _Base::end(); }
         size_type size() const { return _Base::size(); }
         pointer data() { return _Base::data(); }
         const_pointer data() const { return _Base::data(); }
@@ -203,52 +205,52 @@ namespace lcf {
 
 #endif
 
-namespace lcf {
-    template<typename T, typename Alloc = std::allocator<T>>
-    class matrix : private std::vector<T, Alloc> {
-    public:
-        using _Base = std::vector<T, Alloc>;
-        using _Self = matrix<T, Alloc>;
-        using value_type = typename _Base::value_type;
-        using reference = typename _Base::reference;
-        using const_reference = typename _Base::const_reference;
-        using iterator = typename _Base::iterator;
-        using size_type = typename _Base::size_type;
-        //*----------------------------------------------------------------------------*//
-        matrix(size_type row_size, size_type col_size, const_reference value = value_type{})
-        : _Base(row_size * col_size, value), _row_size(row_size), _col_size(col_size) { }
-        iterator begin() { return _Base::begin(); }
-        iterator end() { return _Base::end(); }
-        size_type size() const { return _Base::size(); }
-        size_type row_size() const { return _row_size; }
-        size_type col_size() const { return _col_size; }
-        inline __attribute__((__always_inline__))
-        reference operator()(size_type row_idx, size_type col_idx) noexcept
-        { return this->_M_impl._M_start[row_idx * _col_size + col_idx]; }
-        inline __attribute__((__always_inline__))
-        const_reference operator()(size_type row_idx, size_type col_idx) const noexcept
-        { return this->_M_impl._M_start[row_idx * _col_size + col_idx]; }
-        inline __attribute__((__always_inline__))
-        reference operator()(const std::pair<int, int>& coord) noexcept
-        { return this->_M_impl._M_start[coord.first * _col_size + coord.second]; }
-        inline __attribute__((__always_inline__))
-        const_reference operator()(const std::pair<int, int>& coord) const noexcept
-        { return this->_M_impl._M_start[coord.first * _col_size + coord.second]; }
-        _Self& operator=(const std::initializer_list<value_type>& init_list) { this->assign(init_list); return *this; }
-        _Self& set_value(const value_type& value) { this->assign(this->size(), value_type{}); return *this; }
-        //*----------------------------------------------------------------------------*//
-        friend std::ostream& operator<<(std::ostream& os, const _Self& matrix) {
-            for (int i = 0, n = matrix.row_size(); i < n; ++i) {
-                for (int j = 0, m = matrix.col_size(); j < m; ++j)
-                { os << matrix(i, j) << ' '; } os << std::endl;
-            } return os;
-        }
-        friend std::istream& operator>>(std::istream& is, _Self& matrix) {
-            for (int i = 0, n = matrix.row_size(); i < n; ++i) {
-                for (int j = 0, m = matrix.col_size(); j < m; ++j) { is >> matrix(i, j); }
-            } return is;
-        }
-    private:
-        size_type _row_size, _col_size;
-    };
-}
+// namespace lcf {
+//     template<typename T, typename Alloc = std::allocator<T>>
+//     class matrix : private std::vector<T, Alloc> {
+//     public:
+//         using _Base = std::vector<T, Alloc>;
+//         using _Self = matrix<T, Alloc>;
+//         using value_type = typename _Base::value_type;
+//         using reference = typename _Base::reference;
+//         using const_reference = typename _Base::const_reference;
+//         using iterator = typename _Base::iterator;
+//         using size_type = typename _Base::size_type;
+//         matrix(size_type row_size, size_type col_size, const_reference value = value_type{})
+//         : _Base(row_size * col_size, value), _row_size(row_size), _col_size(col_size) { }
+//         iterator begin() { return _Base::begin(); }
+//         iterator begin() const { return _Base::begin(); }
+//         iterator end() { return _Base::end(); }
+//         iterator end() const { return _Base::end(); }
+//         size_type size() const { return _Base::size(); }
+//         size_type row_size() const { return _row_size; }
+//         size_type col_size() const { return _col_size; }
+//         inline __attribute__((__always_inline__))
+//         reference operator()(size_type row_idx, size_type col_idx) noexcept
+//         { return this->_M_impl._M_start[row_idx * _col_size + col_idx]; }
+//         inline __attribute__((__always_inline__))
+//         const_reference operator()(size_type row_idx, size_type col_idx) const noexcept
+//         { return this->_M_impl._M_start[row_idx * _col_size + col_idx]; }
+//         inline __attribute__((__always_inline__))
+//         reference operator()(const std::pair<int, int>& coord) noexcept
+//         { return this->_M_impl._M_start[coord.first * _col_size + coord.second]; }
+//         inline __attribute__((__always_inline__))
+//         const_reference operator()(const std::pair<int, int>& coord) const noexcept
+//         { return this->_M_impl._M_start[coord.first * _col_size + coord.second]; }
+//         _Self& operator=(const std::initializer_list<value_type>& init_list) { this->assign(init_list); return *this; }
+//         _Self& set_value(const value_type& value) { this->assign(this->size(), value_type{}); return *this; }
+//         friend std::ostream& operator<<(std::ostream& os, const _Self& matrix) {
+//             for (int i = 0, n = matrix.row_size(); i < n; ++i) {
+//                 for (int j = 0, m = matrix.col_size(); j < m; ++j)
+//                 { os << matrix(i, j) << ' '; } os << std::endl;
+//             } return os;
+//         }
+//         friend std::istream& operator>>(std::istream& is, _Self& matrix) {
+//             for (int i = 0, n = matrix.row_size(); i < n; ++i) {
+//                 for (int j = 0, m = matrix.col_size(); j < m; ++j) { is >> matrix(i, j); }
+//             } return is;
+//         }
+//     private:
+//         size_type _row_size, _col_size;
+//     };
+// }

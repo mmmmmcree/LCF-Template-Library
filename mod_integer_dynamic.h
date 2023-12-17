@@ -22,12 +22,15 @@ namespace lcf {
     public:
         using value_type = Integer;
         static void set_moder(const size_t _MODULUS) { MODULUS = _MODULUS; }
+        static _Self A(size_t n, size_t r);
+        static _Self C(size_t n, size_t r);
+        static _Self Lucas(size_t n, size_t r);
         constexpr mod_integer(value_type value = 0) : _value(value) { }
         mod_integer(const _Self&) = default;
         value_type positive_value() const { return (_value % MODULUS + MODULUS) % MODULUS; }
         value_type actual_value() const { return _value; }
         //! bool invertible() { return std::gcd(_value, MODULUS) == 1; }
-        value_type mod_inverse(value_type moder) { return lcf::extended_gcd(_value, moder).first; }
+        value_type mod_inverse(value_type moder) const { return lcf::extended_gcd(_value, moder).first; }
         friend _Self operator+(const _Self& lhs, const _Self& rhs)
         { return _Self((lhs._value + rhs._value) % MODULUS); }
         friend _Self& operator+=(_Self& lhs, const _Self& rhs)
@@ -40,6 +43,20 @@ namespace lcf {
         { return _Self(lhs._value * rhs._value % MODULUS); }
         friend _Self& operator*=(_Self& lhs, const _Self& rhs)
         { (lhs._value *= rhs._value) %= MODULUS; return lhs; }
+        friend _Self operator^(_Self base, size_t exponent) {
+            _Self power(1);
+            for (; exponent > 0; exponent >>= 1, base *= base) {
+                if (exponent & 1) { power *= base; }
+            }
+            return power;
+        }
+        friend _Self& operator^=(_Self& power, size_t exponent) {
+            if (exponent-- == 0) { power._value = 1; return power; }
+            for (_Self base = power; exponent > 0; exponent >>= 1, base *= base) {
+                if (exponent & 1) { power *= base; }
+            }
+            return power;
+        }
         friend _Self operator/(const _Self& lhs, const _Self& rhs)
         { return _Self(lhs._value * rhs.mod_inverse(MODULUS) % MODULUS); }
         friend _Self& operator/=(_Self& lhs, const _Self& rhs)
@@ -59,12 +76,39 @@ namespace lcf {
                 lhs += lhs;
             }
             return result;
-        }          
+        }
     private:
         std::enable_if_t<std::is_integral_v<value_type>, value_type> _value;
     public:
         inline static value_type MODULUS = 1e9 + 7;
     };
+
+    template<typename Integer>
+    mod_integer<Integer> mod_integer<Integer>::A(size_t n, size_t r) {
+        if (r > n) { return 0; }
+        r = std::min(r, n - r);
+        if (r == 0) { return 1; }
+        mod_integer<Integer> num(1);
+        for (size_t i = n; i > n - r; --i) { num *= i; }
+        return num;
+    }
+
+    template<typename Integer>
+    mod_integer<Integer> mod_integer<Integer>::C(size_t n, size_t r) {
+        if (r > n) { return 0; }
+        r = std::min(r, n - r);
+        if (r == 0) { return 1; }
+        mod_integer<Integer> num(1), den(1);
+        for (size_t i = n; i > n - r; --i) { num *= i; }
+        for (size_t i = r; i > 0; --i) { den *= i; }
+        return num / den;
+    }
+
+    template<typename Integer>
+    mod_integer<Integer> mod_integer<Integer>::Lucas(size_t n, size_t r) {
+        if (r == 0) { return 1; }
+        return Lucas(n / MODULUS, r / MODULUS) * C(n % MODULUS, r % MODULUS);
+    }
 }
 
 namespace lcf {
